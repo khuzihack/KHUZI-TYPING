@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KHUZITYPING.COM - Typing Test</title>
+  <style>
+    :root { --bg:#0f1220; --card:#14182b; --text:#e7e9ee; --muted:#a7adc0; --accent:#6ea8fe; --accent-2:#86efac; }
+    *{box-sizing:border-box}
+    body {
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 20% -10%, #1b2140 0%, transparent 60%),
+                  radial-gradient(800px 500px at 110% 10%, #1a2a4a 0%, transparent 60%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .container {
+      width: min(900px, 100%);
+      background: linear-gradient(180deg, #13172a 0%, #0f1326 100%);
+      border: 1px solid #202647;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+      padding: 24px;
+    }
+    header {
+      display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom: 12px;
+    }
+    .brand {
+      display:flex; align-items:center; gap:10px; letter-spacing:.3px;
+    }
+    .brand .logo {
+      width:36px; height:36px; border-radius:10px; background:
+        conic-gradient(from 180deg, #6ea8fe, #86efac, #6ea8fe);
+      filter: saturate(120%);
+      box-shadow: 0 0 16px rgba(110,168,254,.4);
+    }
+    h1 { font-size: clamp(18px, 3vw, 24px); margin:0; font-weight:700;}
+    .muted { color: var(--muted); font-size: 14px; }
+    .row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+    select, button, input[type="number"] {
+      background:#0e1324; color:var(--text); border:1px solid #222a4c; border-radius:12px;
+      padding:10px 12px; font-size:14px; outline:none;
+    }
+    button {
+      background: linear-gradient(180deg, #1b3b84, #16326e);
+      border-color:#2a4fa1;
+      cursor:pointer; font-weight:600;
+      box-shadow: 0 6px 16px rgba(46,102,255,.25);
+    }
+    button.secondary{ background:#0e1324; border-color:#2a355f; box-shadow:none; }
+    button:disabled { opacity:.6; cursor:not-allowed; }
+    #testText {
+      margin: 16px 0;
+      background:#0e1324;
+      border:1px solid #1f2648;
+      border-radius: 14px;
+      padding: 18px;
+      min-height: 96px;
+      line-height:1.6;
+      font-size: clamp(16px, 2.2vw, 18px);
+    }
+    #testText span.correct{ color:#86efac; }
+    #testText span.incorrect{ color:#ff8585; text-decoration: underline; }
+    #testText span.active{ outline: 1px dashed #6ea8fe; border-radius: 4px; padding:2px 1px;}
+    textarea {
+      width:100%; height:120px; resize:none; border-radius:14px; border:1px solid #1f2648;
+      background:#0b1021; color:var(--text); padding:14px; font-size:16px; line-height:1.5;
+    }
+    .stats {
+      display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-top:12px;
+    }
+    .card {
+      background:#0e1324; border:1px solid #1f2648; border-radius:14px; padding:12px; text-align:center;
+    }
+    .card .label{ font-size:12px; color:var(--muted); }
+    .card .value{ font-size:22px; font-weight:800; margin-top:4px; }
+    .footer { margin-top:14px; text-align:center; font-size:12px; color:var(--muted); }
+    .controls{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>KHUZITYPING.COM</h1>
+          <div class="muted">Fast. Clean. Offline typing test.</div>
+        </div>
+      </div>
+      <div class="row">
+        <label class="muted">Duration</label>
+        <select id="duration">
+          <option value="30">30 seconds</option>
+          <option value="60" selected>1 minute</option>
+          <option value="120">2 minutes</option>
+          <option value="180">3 minutes</option>
+        </select>
+        <button id="startBtn">Start</button>
+        <button id="resetBtn" class="secondary" disabled>Reset</button>
+      </div>
+    </header>
+
+    <div id="testText" aria-live="polite">Press <b>Start</b> to begin.</div>
+    <textarea id="input" placeholder="Start typing here..." disabled></textarea>
+
+    <div class="stats">
+      <div class="card"><div class="label">Time</div><div id="timeVal" class="value">0s</div></div>
+      <div class="card"><div class="label">WPM</div><div id="wpmVal" class="value">0</div></div>
+      <div class="card"><div class="label">Accuracy</div><div id="accVal" class="value">100%</div></div>
+      <div class="card"><div class="label">Errors</div><div id="errVal" class="value">0</div></div>
+    </div>
+
+    <div class="footer">© 2025 KHUZITYPING.COM — No tracking. No ads.</div>
+  </div>
+
+  <script>
+    const TEXTS = [
+      "The quick brown fox jumps over the lazy dog.",
+      "Practice daily to improve both typing speed and accuracy.",
+      "Cybersecurity demands focus, patience, and consistent learning.",
+      "A clean mind and proper posture help you type faster.",
+      "Measure progress weekly and fix the keys you miss most.",
+      "Typing is a core skill for coding, writing, and research."
+    ];
+
+    const el = (id) => document.getElementById(id);
+    const durationSel = el("duration");
+    const startBtn = el("startBtn");
+    const resetBtn = el("resetBtn");
+    const input = el("input");
+    const testText = el("testText");
+    const timeVal = el("timeVal");
+    const wpmVal = el("wpmVal");
+    const accVal = el("accVal");
+    const errVal = el("errVal");
+
+    let original, startTime, countdown, ended = false;
+
+    function pickText(){
+      original = TEXTS[Math.floor(Math.random()*TEXTS.length)];
+      renderTarget("");
+    }
+
+    function renderTarget(typed){
+      let html = "";
+      const minLen = Math.max(original.length, typed.length);
+      let errors = 0;
+      for(let i=0;i<minLen;i++){
+        const o = original[i] || "";
+        const t = typed[i] || "";
+        if(t === ""){
+          html += `<span>${escapeHtml(o)}</span>`;
+        }else if(t === o){
+          html += `<span class="correct">${escapeHtml(o)}</span>`;
+        }else{
+          errors++;
+          html += `<span class="incorrect">${escapeHtml(o || t)}</span>`;
+        }
+        if(i === typed.length){
+          html += `<span class="active">${escapeHtml(original[typed.length] || "")}</span>`;
+        }
+      }
+      if(typed.length === 0){
+        html = `<span class="active">${escapeHtml(original[0])}</span>` + escapeHtml(original.slice(1));
+      }
+      testText.innerHTML = html;
+      errVal.textContent = errors.toString();
+      return errors;
+    }
+
+    function escapeHtml(s){
+      return (s || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    }
+
+    function calcStats(typed, elapsedSec){
+      const chars = typed.length;
+      const words = typed.trim().length ? typed.trim().split(/\s+/).length : 0;
+      const grossWPM = elapsedSec > 0 ? Math.round((chars/5) / (elapsedSec/60)) : 0;
+
+      // Accuracy = correct chars / typed chars
+      let correct = 0;
+      for(let i=0;i<chars;i++){
+        if(typed[i] === original[i]) correct++;
+      }
+      const acc = chars ? Math.round((correct / chars) * 100) : 100;
+
+      // Net WPM (optional): gross - uncorrected errors/elapsedMinutes
+      // For simplicity display gross; accuracy covers quality.
+      return { grossWPM, acc };
+    }
+
+    function start(){
+      ended = false;
+      pickText();
+      input.value = "";
+      input.disabled = false;
+      input.focus();
+      startBtn.disabled = true;
+      resetBtn.disabled = false;
+
+      const total = parseInt(durationSel.value, 10);
+      startTime = Date.now();
+      update();
+      countdown = setInterval(update, 100);
+
+      function update(){
+        const now = Date.now();
+        let elapsed = Math.min((now - startTime)/1000, total);
+        const left = Math.max(0, Math.ceil(total - elapsed));
+        timeVal.textContent = (total - left).toFixed(1) + "s";
+
+        const typed = input.value;
+        renderTarget(typed);
+        const {grossWPM, acc} = calcStats(typed, Math.max(elapsed, 0.1));
+        wpmVal.textContent = String(grossWPM);
+        accVal.textContent = acc + "%";
+
+        if(elapsed >= total) finish();
+      }
+    }
+
+    function finish(){
+      if(ended) return;
+      ended = true;
+      clearInterval(countdown);
+      input.disabled = true;
+      startBtn.disabled = false;
+      // Brief highlight
+      wpmVal.parentElement.style.outline = "2px solid var(--accent)";
+      setTimeout(()=> wpmVal.parentElement.style.outline = "none", 800);
+    }
+
+    function reset(){
+      clearInterval(countdown);
+      input.value = "";
+      input.disabled = true;
+      startBtn.disabled = false;
+      resetBtn.disabled = true;
+      testText.textContent = "Press Start to begin.";
+      timeVal.textContent = "0s";
+      wpmVal.textContent = "0";
+      accVal.textContent = "100%";
+      errVal.textContent = "0";
+    }
+
+    startBtn.addEventListener("click", start);
+    resetBtn.addEventListener("click", reset);
+  </script>
+</body>
+</html>
