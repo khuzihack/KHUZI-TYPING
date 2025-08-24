@@ -170,7 +170,7 @@
         html = `<span class="active">${escapeHtml(original[0])}</span>` + escapeHtml(original.slice(1));
       }
       testText.innerHTML = html;
-      errVal.textContent = errors.toString();
+⁸      errVal.textContent = errors.toString();
       return errors;
     }
 
@@ -254,3 +254,61 @@
   </script>
 </body>
 </html>
+<style>
+  :root {
+    --bg:#f5f7fb;         /* Light background */
+    --card:#ffffff;       /* White cards */
+    --text:#1d1f27;       /* Dark text */
+    --muted:#6b7280;      /* Muted gray */
+    --accent:#2563eb;     /* Blue accent */
+    --accent-2:#16a34a;   /* Green accent */
+  }
+  *{box-sizing:border-box}
+  body {
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    background: linear-gradient(135deg, #dbeafe 0%, #f0fdf4 100%); /* Soft gradient */
+    color: var(--text);
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
+  .container {
+    width: min(900px, 100%);
+    background: var(--card);
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    padding: 24px;
+  }
+  .brand .logo {
+    width:36px; height:36px; border-radius:10px; 
+    background: conic-gradient(from 180deg, var(--accent), var(--accent-2), var(--accent));
+    box-shadow: 0 0 12px rgba(37,99,235,.3);
+  }
+  #testText {
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius: 14px;
+    color: var(--text);
+  }
+  textarea {
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    color: var(--text);
+  }
+  .card {
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+  }
+  button {
+    background: linear-gradient(180deg, #3b82f6, #2563eb);
+    border:none;
+    color:#fff;
+  }
+  button.secondary {
+    background:#f3f4f6;
+    color: var(--text);
+  }
+</style>
